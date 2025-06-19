@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Hello!</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+      <h1 class="title">Hello! </h1>
+      <p id="currentTime"></p>
+      <script src="script.js"></script>
+  </body>
+</html<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OAV Chittalpur</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        header {
+            background-color: #004aad;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+        header img {
+            width: 100px;
+            vertical-align: middle;
+        }
+        header h1 {
+            display: inline;
+            margin-left: 10px;
+            font-size: 2.5em;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .section {
+            margin-bottom: 30px;
+        }
+        .section h2 {
+            color: #004aad;
+            border-bottom: 2px solid #004aad;
+            padding-bottom: 10px;
+        }
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        .content-item {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+            background: #fafafa;
+        }
+        .content-item img, .content-item video {
+            max-width: 100%;
+            height: auto;
+            border-radius: 5px;
+        }
+        .content-item p {
+            margin: 10px 0;
+        }
+        .edit-btn {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 1em;
+            border-radius: 5px;
+        }
+        .edit-btn:hover {
+            background-color: #218838;
+        }
+        .edit-form {
+            display: none;
+            background: #f9f9f9;
+            padding: 20px;
+            border: 1px solid #ddd;
+            margin-top: 20px;
+        }
+        .edit-form input, .edit-form textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .edit-form button {
+            padding: 10px 20px;
+            background-color: #004aad;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .edit-form button:hover {
+            background-color: #003080;
+        }
+        @media (max-width: 600px) {
+            header h1 {
+                font-size: 1.8em;
+            }
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <img src="https://oav.edu.in/images/logo.png" alt="OAV Logo">
+        <h1>OAV Chittalpur</h1>
+    </header>
+    <div class="container">
+        <div class="section">
+            <h2>About OAV Facilities</h2>
+            <p>Odisha Adarsha Vidyalayas (OAVs) are CBSE-affiliated English-medium schools designed to provide quality education in rural and semi-urban areas of Odisha. The facilities at OAV Chittalpur, aligned with OAV standards, include:</p>
+            <ul>
+                <li><strong>Modern Classrooms</strong>: Equipped with smart boards and ICT labs for interactive learning.</li>
+                <li><strong>Advanced Laboratories</strong>: Science and computer labs for practical education.</li>
+                <li><strong>Library</strong>: E-library and physical library with a wide range of books and digital resources.</li>
+                <li><strong>Hostel Facilities</strong>: Separate hostels for boys and girls with modern amenities (available at select OAVs).</li>
+                <li><strong>Sports Infrastructure</strong>: Playgrounds and equipment for physical development.</li>
+                <li><strong>Mid-Day Meals</strong>: Nutritious meals, with doorstep delivery during emergencies like COVID-19.</li>
+                <li><strong>Co-Curricular Activities</strong>: Arts, music, and cultural programs to foster holistic growth.</li>
+                <li><strong>Teacher-Student Ratio</strong>: 1:25 ratio for personalized attention.</li>
+            </ul>
+            <p>Note: Specific facilities at OAV Chittalpur may vary. Contact the school administration for exact details.</p>
+        </div>
+        <div class="section">
+            <h2>Gallery</h2>
+            <div class="content-grid" id="gallery"></div>
+        </div>
+        <div class="section">
+            <h2>Videos</h2>
+            <div class="content-grid" id="videos"></div>
+        </div>
+        <div class="section">
+            <h2>Write-Ups</h2>
+            <div class="content-grid" id="writeups"></div>
+        </div>
+        <button class="edit-btn" onclick="promptPassword()">Edit Content</button>
+        <div class="edit-form" id="editForm">
+            <h3>Add New Content</h3>
+            <input type="file" id="imageFile" accept="image/*" onchange="previewImage()">
+            <img id="imagePreview" style="display:none; max-width:100%; margin:10px 0;">
+            <input type="file" id="videoFile" accept="video/*" onchange="previewVideo()">
+            <video id="videoPreview" style="display:none; max-width:100%; margin:10px 0;" controls></video>
+            <textarea id="writeupText" placeholder="Write-up text" rows="5"></textarea>
+            <button onclick="addContent()">Add Content</button>
+        </div>
+    </div>
+
+    <script>
+        const ADMIN_PASSWORD = "admin123"; // Change this to your preferred password
+        let gallery = JSON.parse(localStorage.getItem("gallery")) || [];
+        let videos = JSON.parse(localStorage.getItem("videos")) || [];
+        let writeups = JSON.parse(localStorage.getItem("writeups")) || [];
+
+        function renderContent() {
+            const galleryDiv = document.getElementById("gallery");
+            const videosDiv = document.getElementById("videos");
+            const writeupsDiv = document.getElementById("writeups");
+
+            galleryDiv.innerHTML = gallery.map(item => `
+                <div class="content-item">
+                    <img src="${item}" alt="Gallery Image">
+                </div>
+            `).join("");
+
+            videosDiv.innerHTML = videos.map(item => `
+                <div class="content-item">
+                    <video controls>
+                        <source src="${item}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+            `).join("");
+
+            writeupsDiv.innerHTML = writeups.map(item => `
+                <div class="content-item">
+                    <p>${item}</p>
+                </div>
+            `).join("");
+        }
+
+        function promptPassword() {
+            const password = prompt("Enter password to edit content:");
+            if (password === ADMIN_PASSWORD) {
+                document.getElementById("editForm").style.display = "block";
+            } else {
+                alert("Incorrect password!");
+            }
+        }
+
+        function previewImage() {
+            const file = document.getElementById("imageFile").files[0];
+            const preview = document.getElementById("imagePreview");
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.style.display = "block";
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function previewVideo() {
+            const file = document.getElementById("videoFile").files[0];
+            const preview = document.getElementById("videoPreview");
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.style.display = "block";
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function addContent() {
+            const imageFile = document.getElementById("imageFile").files[0];
+            const videoFile = document.getElementById("videoFile").files[0];
+            const writeupText = document.getElementById("writeupText").value;
+
+            if (imageFile) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    gallery.push(e.target.result);
+                    localStorage.setItem("gallery", JSON.stringify(gallery));
+                    renderContent();
+                };
+                reader.readAsDataURL(imageFile);
+            }
+
+            if (videoFile) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    videos.push(e.target.result);
+                    localStorage.setItem("videos", JSON.stringify(videos));
+                    renderContent();
+                };
+                reader.readAsDataURL(videoFile);
+            }
+
+            if (writeupText) {
+                writeups.push(writeupText);
+                localStorage.setItem("writeups", JSON.stringify(writeups));
+                renderContent();
+            }
+
+            // Reset form
+            document.getElementById("imageFile").value = "";
+            document.getElementById("videoFile").value = "";
+            document.getElementById("writeupText").value = "";
+            document.getElementById("imagePreview").style.display = "none";
+            document.getElementById("videoPreview").style.display = "none";
+        }
+
+        // Initial render
+        renderContent();
+    </script>
+</body>
+</html>
